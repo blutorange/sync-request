@@ -1,5 +1,20 @@
 # sync-request
 
+## Branch from ForbesLindesay/sync-request 
+
+Issue #74: Netcat keeps the connection open until the server closes
+the connection. The lib/nc-server.js keeps listening for data from
+the client which never comes, causing the netcat command to hang.
+
+Using the [data event from net.Socket](https://nodejs.org/api/net.html#net_event_data)
+gives us access to the data whenever some is sent by the client. This can be buffered
+until the client sends ends with "\r\n" to indicate it is done sending. This causes
+the nc-server.js to prepare the response, send it and end the connection.
+
+"\r\r\n" was chosen as it is ignored by JSON, ie. does not alter the JSON message.
+
+---------------------------
+
 Make synchronous web requests with cross platform support.
 
 # **N.B.** You should **not** be using this in a production application.  In a node.js application you will find that you are completely unable to scale your server.  In a client application you will find that sync-request causes the app to hang/freeze.  Synchronous web requests are the number one cause of browser crashes.  For production apps, you should use [then-request](https://github.com/then/then-request), which is exactly the same except that it is asynchronous.
